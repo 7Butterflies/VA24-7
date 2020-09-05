@@ -1,0 +1,144 @@
+﻿@page "/activity"
+
+@using model = VA24_7_Shared.Model;
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@inject VA24_7_BandAgent.Service.ActivityService activityService;
+
+<h1>Band Agent</h1>
+
+<div class="row col-12">
+    <div class="form-group col-4">
+        <div class="card">
+            <div class="card-header">
+                Pulserate
+            </div>
+            <div class="card-body">
+                @activity.Pulserate
+            </div>
+        </div>
+    </div>
+    <div class="form-group col-4">
+        <div class="card">
+            <div class="card-header">
+                PulseStatus
+            </div>
+            <div class="card-body">
+                @activity.PulseStatus
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row col-12">
+    <div class="form-group">
+        @if (activity.IsRunning)
+        {
+            <button class="btn btn-primary" @onclick="StopRunning">Stop Running</button>
+
+        }
+        else
+        {
+            <button class="btn btn-primary" @onclick="StartRunning">Start Running</button>
+        }
+        <small>Pulse is @PulseStatus</small>
+    </div>
+</div>
+
+
+@code {
+    private string PulseStatus = "Normal";
+    private Random random = new Random();
+    public static model.Activity activity = new model.Activity();
+    private bool IsOnCustomActivity = false;
+
+    protected override void OnInitialized()
+    {
+        InitializeActivity();
+    }
+
+    private void InitializeActivity()
+    {
+        Task.Run(async () =>
+        {
+            while (!IsOnCustomActivity)
+            {
+                await Task.Delay(1000);
+                activity.Pulserate += random.Next(0, 5);
+                activity.PulseStatus = GetPulseStatus();
+                await InvokeAsync(() => StateHasChanged());
+
+                await Task.Delay(1000);
+                activity.Pulserate -= random.Next(0, 5);
+                activity.PulseStatus = GetPulseStatus();
+                await InvokeAsync(() => StateHasChanged());
+
+                if (IsOnCustomActivity)
+                    break;
+            // await activityService.SendMessageToIoTHub(activity);
+        }
+        });
+    }
+
+    private void StartRunning()
+    {
+        PulseStatus = "Pumping";
+        IsOnCustomActivity = true;
+        activity.IsRunning = true;
+        Task.Run(async () =>
+        {
+            while (activity.IsRunning)
+            {
+                await Task.Delay(1000);
+                activity.Pulserate += random.Next(0, 5);
+
+            //Asuming the heart stop if the pulse us greater than 160 bpm.
+            if (activity.Pulserate > 160)
+                    activity.Pulserate = 0;
+                activity.PulseStatus = GetPulseStatus();
+                await InvokeAsync(() => StateHasChanged());
+            // await activityService.SendMessageToIoTHub(activity);
+
+            if (!activity.IsRunning)
+                    break;
+            }
+        });
+    }
+
+    private void StopRunning()
+    {
+        activity.IsRunning = false;
+        PulseStatus = "Stabilizing";
+        Task.Run(async () =>
+        {
+            while (!activity.IsRunning)
+            {
+                await Task.Delay(1000);
+                activity.Pulserate -= random.Next(0, 5);
+                activity.PulseStatus = GetPulseStatus();
+                await InvokeAsync(() => StateHasChanged());
+
+                if (activity.Pulserate <= 50)
+                {
+                    PulseStatus = "Normal";
+                    await InvokeAsync(() => StateHasChanged());
+                    IsOnCustomActivity = false;
+                    InitializeActivity();
+                    break;
+                }
+            }
+        });
+    }
+
+    private model.PulseStatus GetPulseStatus()
+    {
+        return activity.Pulserate switch
+        {
+            _ when activity.Pulserate <= 40 => model.PulseStatus.Low,
+            _ when activity.Pulserate > 40 && activity.Pulserate <= 70 => model.PulseStatus.Normal,
+            _ when activity.Pulserate > 70 && activity.Pulserate <= 120 => model.PulseStatus.High,
+            _ when activity.Pulserate > 120 && activity.Pulserate <= 160 => model.PulseStatus.Critical,
+            0 => model.PulseStatus.Failure
+        };
+    }
+}

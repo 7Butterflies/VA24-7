@@ -5,4 +5,12 @@
     <RootNamespace>VA24_7_BandAgent</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.28.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VA24-7-Shared\VA24-7-Shared.csproj" />
+  </ItemGroup>
+
 </Project>
