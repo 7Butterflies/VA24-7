@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.Azure.Devices.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VA24_7_BandAgent.Hub;
 using VA24_7_BandAgent.Service;
 
 namespace VA24_7_BandAgent
@@ -18,9 +20,13 @@ namespace VA24_7_BandAgent
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            IoTDeviceClient = DeviceClient.CreateFromConnectionString(this.Configuration["ConnectionStrings:DeviceConnectionString"]);
+            IoTDeviceClient.OpenAsync();
         }
 
         public IConfiguration Configuration { get; }
+        public DeviceClient IoTDeviceClient { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -28,6 +34,7 @@ namespace VA24_7_BandAgent
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddSingleton<IIoTHub>(new IoTHub(this.IoTDeviceClient));
             services.AddSingleton<ActivityService>();
         }
 
