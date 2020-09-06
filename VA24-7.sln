@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-BandAgent", "VA24-7-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-Shared", "VA24-7-Shared\VA24-7-Shared.csproj", "{BD437CB7-196B-4134-B7EE-190B00BA4B2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-AF", "VA24-7-AF\VA24-7-AF.csproj", "{0775963D-30D0-4E5E-B388-EC554223BDB4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BD437CB7-196B-4134-B7EE-190B00BA4B2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD437CB7-196B-4134-B7EE-190B00BA4B2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD437CB7-196B-4134-B7EE-190B00BA4B2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0775963D-30D0-4E5E-B388-EC554223BDB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0775963D-30D0-4E5E-B388-EC554223BDB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0775963D-30D0-4E5E-B388-EC554223BDB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0775963D-30D0-4E5E-B388-EC554223BDB4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
