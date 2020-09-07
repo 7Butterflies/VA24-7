@@ -10,9 +10,8 @@ namespace VA24_7_Shared.Model
         public PulseStatus PulseStatus { get; set; } = PulseStatus.Normal;
     }
 
-    public class IoT
+    public class CloudToDevice : IoT
     {
-        public string DeviceId { get; set; }
-        public dynamic SystemProperties { get; set; }
+        public string Comments { get; set; }
     }
 }

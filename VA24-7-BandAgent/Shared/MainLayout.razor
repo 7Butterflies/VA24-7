@@ -1,15 +1,41 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime JsRuntime;
 
 <div class="sidebar">
     <NavMenu />
 </div>
 
+@InitializeJSRuntime(JsRuntime);
+
 <div class="main">
     <div class="top-row px-4">
         <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
     </div>
-
+    <div class="container" style="display:none;" id="SuccessAlert">
+        <div class="alert alert-success alert-dismissible fade show">
+            <button type="button" class="close" aria-label="Close" @onclick="@HideSuccessAlert">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong id="SuccessMessage"></strong>
+        </div>
+    </div>
     <div class="content px-4">
         @Body
     </div>
 </div>
+@code{
+
+    public static IJSRuntime JSRuntime { get; set; }
+
+    private object InitializeJSRuntime(IJSRuntime jS)
+    {
+        JSRuntime = jS;
+        return null;
+    }
+
+    private async void HideSuccessAlert()
+    {
+        // JavaScript Method is on the Index.HTML in the Head
+        await JsRuntime.InvokeAsync<object>("HideAlert", "SuccessAlert");
+    }
+}
