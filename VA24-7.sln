@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-BandAgent", "VA24-7-BandAgent\VA24-7-BandAgent.csproj", "{74C73453-4432-4D74-B0DE-291DE8A0F4EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VA24-7-BandAgent", "VA24-7-BandAgent\VA24-7-BandAgent.csproj", "{74C73453-4432-4D74-B0DE-291DE8A0F4EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-Shared", "VA24-7-Shared\VA24-7-Shared.csproj", "{BD437CB7-196B-4134-B7EE-190B00BA4B2E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VA24-7-Shared", "VA24-7-Shared\VA24-7-Shared.csproj", "{BD437CB7-196B-4134-B7EE-190B00BA4B2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-AF", "VA24-7-AF\VA24-7-AF.csproj", "{0775963D-30D0-4E5E-B388-EC554223BDB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VA24-7-AF", "VA24-7-AF\VA24-7-AF.csproj", "{0775963D-30D0-4E5E-B388-EC554223BDB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-WebPortal", "VA24-7-WebPortal\VA24-7-WebPortal.csproj", "{F8BD3ECF-53D9-475E-8AE4-6F32DD4CF151}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{0775963D-30D0-4E5E-B388-EC554223BDB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0775963D-30D0-4E5E-B388-EC554223BDB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0775963D-30D0-4E5E-B388-EC554223BDB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8BD3ECF-53D9-475E-8AE4-6F32DD4CF151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8BD3ECF-53D9-475E-8AE4-6F32DD4CF151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8BD3ECF-53D9-475E-8AE4-6F32DD4CF151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8BD3ECF-53D9-475E-8AE4-6F32DD4CF151}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
