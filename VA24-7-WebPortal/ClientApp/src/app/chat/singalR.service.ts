@@ -10,7 +10,7 @@ import { SignalRConnection } from '../model/signaR-connection-model';
 })
 
 export class SignalRService {
-  messages: Subject<string> = new Subject();
+  messages: Subject<any> = new Subject();
 
   private hubConnection: SignalR.HubConnection;
   constructor(private http: HttpClient) {
@@ -31,12 +31,9 @@ export class SignalRService {
         .configureLogging(SignalR.LogLevel.Information)
         .build();
 
-      // this.addUserToGroup();
-
       this.hubConnection.on('newMessage', data => {
         this.messages.next(data);
       });
-
 
       this.hubConnection.start().then(() => {
 
@@ -53,11 +50,12 @@ export class SignalRService {
     });
   }
 
-  sendMessage(user, message) {
-    return this.http.post(`${environment.apiBaseUrl}/sendMessage/${user}`, JSON.stringify({ "message": message })).toPromise();
+  sendMessage(senderId, recipientPersonId, body) {
+    return this.http.post(`${environment.apiBaseUrl}/sendMessage/${senderId}/${recipientPersonId}`, body).toPromise();
   }
 
-  addUserToGroup() {
-    return this.hubConnection.invoke("AddUserToGroup", "user1", "group1");
+  getConversation(id, partitionKey) {
+    return this.http.get(`${environment.apiBaseUrl}/conversations/${id}/${partitionKey}`).toPromise();
   }
+
 }

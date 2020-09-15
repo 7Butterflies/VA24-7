@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VA24-7-Shared", "VA24-7-Sha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VA24-7-AF", "VA24-7-AF\VA24-7-AF.csproj", "{0775963D-30D0-4E5E-B388-EC554223BDB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VA24-7-WebPortal", "VA24-7-WebPortal\VA24-7-WebPortal.csproj", "{F8BD3ECF-53D9-475E-8AE4-6F32DD4CF151}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VA24-7-WebPortal", "VA24-7-WebPortal\VA24-7-WebPortal.csproj", "{F8BD3ECF-53D9-475E-8AE4-6F32DD4CF151}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
