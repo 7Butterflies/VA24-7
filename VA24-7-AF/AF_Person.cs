@@ -7,29 +7,28 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Net.Http;
+using System.Collections.Generic;
+using Microsoft.Azure.Documents.Client;
+using VA24_7_Shared.Model;
 
 namespace VA24_7_AF
 {
     public static class AF_Person
     {
-        [FunctionName("AF_GET_PERSON")]
-        public static async Task<IActionResult> AF_GET_PERSON(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "person/{id}")] HttpRequest req, string id,
-            ILogger log)
+        [FunctionName(nameof(AF_ADD_PERSON))]
+        public static dynamic AF_ADD_PERSON(
+[HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "person")]HttpRequestMessage req,
+[CosmosDB(
+                databaseName: "VA24-7-DB",
+                collectionName: "collection",
+                ConnectionStringSetting = "CosmosDBConnection")] DocumentClient documentClient,
+ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            dynamic body = Task.Run(async () => { return await req.Content.ReadAsStringAsync(); }).Result;
+            var person = JsonConvert.DeserializeObject<Person>(body as string);
 
-            string name = req.Query["name"];
-
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            return null;
         }
     }
 }

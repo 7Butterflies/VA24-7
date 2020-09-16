@@ -13,5 +13,6 @@ namespace VA24_7_Shared.Model
     public class CloudToDevice : IoT
     {
         public string Comments { get; set; }
+        public string ResponseStatus { get; set; }
     }
 }
