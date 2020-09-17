@@ -10,6 +10,8 @@ namespace VA24_7_Shared.Model
         public string FullName { get; set; }
         public string Surname { get; set; }
         public string Email { get; set; }
+        public string Country { get; set; }
+        public string City { get; set; }
         public string B2CObjectId { get; set; }
         public string Role { get; set; }
     }
