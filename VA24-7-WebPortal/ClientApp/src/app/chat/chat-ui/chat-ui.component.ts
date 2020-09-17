@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SignalRService } from '../singalR.service';
 import { String } from 'typescript-string-operations';
+import { SharedService } from '../../shared/services/shared.service';
 
 @Component({
   selector: 'chat-ui',
@@ -9,24 +10,54 @@ import { String } from 'typescript-string-operations';
 })
 export class ChatUiComponent implements OnInit {
 
-  constructor(public signalRService: SignalRService) { }
+  loggedInUserB2CId;
+  constructor(public signalRService: SignalRService, public sharedService: SharedService) { }
+
+  promises: Promise<any>[] = [];
+
   messages = [];
   chat: Conversation;
 
-  senderId;
   ngOnInit(): void {
+    this.chat = new Conversation();
+    this.promises.push(this.getLoggedInUser());
 
+    Promise.all(this.promises).then(_ => {
+      this.getContacts();
+      this.initializeSignalR();
+      alert("signalR Initialized");
+    })
   }
 
   initializeSignalR() {
-    this.signalRService.init(this.senderId);
-    this.chat = new Conversation();
+    this.signalRService.init(this.loggedInUserB2CId);
 
     this.signalRService.messages.subscribe(data => {
-      JSON.stringify(data);
       this.chat.messages.push(data as Message);
     });
-    this.getConversation(this.senderId, this.toUser);
+    
+  }
+
+  recipient;
+  selectContact(item) {
+    this.recipient = item;
+    this.getConversation(this.loggedInUserB2CId, this.recipient.b2CObjectId);
+  }
+
+  contacts = [];
+  getContacts() {
+    this.signalRService.getContacts().then((res) => {
+      this.contacts = res as [];
+      this.contacts = this.contacts.filter(x => x.b2CObjectId != this.loggedInUser.b2CObjectId);
+    })
+  }
+
+  loggedInUser;
+  getLoggedInUser() {
+    return this.sharedService.getLoggedInUser().then((res) => {
+      this.loggedInUser = res;
+      this.loggedInUserB2CId = res.b2CObjectId
+    })
   }
 
   getConversation(senderPersonId, recipientPersonId) {
@@ -41,18 +72,20 @@ export class ChatUiComponent implements OnInit {
     })
   }
 
-  toUser;
   message;
   SendMessage() {
     let message = new Message();
     message.content = this.message;
-    message.sentOn = Date.now();
-    message.recipientPersonId = this.toUser;
-    message.senderPersonId = this.senderId;
-
+    message.sentOn = new Date();
+    message.sender.Name = this.loggedInUser.fullName;
+    message.sender.personId = this.loggedInUserB2CId;
+    message.recipient.Name = this.recipient.fullName;
+    message.recipient.personId = this.recipient.b2CObjectId;
     this.chat.messages.push(message);
 
-    this.signalRService.sendMessage(this.senderId, this.toUser, JSON.stringify(message)).then(() => {
+    this.message = "";
+
+    this.signalRService.sendMessage(this.loggedInUserB2CId, this.recipient.b2CObjectId, JSON.stringify(message)).then(() => {
       console.log("sent");
     }).catch(err => {
       console.error(err);
@@ -66,10 +99,15 @@ export class Conversation {
 }
 
 export class Message {
-  senderPersonId;
-  recipientPersonId;
+  sender: Person = new Person;
+  recipient: Person = new Person;
   messageId;
   content;
   sentOn;
   readOn;
+}
+
+export class Person {
+  personId;
+  Name;
 }

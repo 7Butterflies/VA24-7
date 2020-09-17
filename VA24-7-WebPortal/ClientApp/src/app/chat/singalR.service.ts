@@ -58,4 +58,8 @@ export class SignalRService {
     return this.http.get(`${environment.apiBaseUrl}/conversations/${id}/${partitionKey}`).toPromise();
   }
 
+  getContacts(id?) {
+    return this.http.get(`${environment.apiBaseUrl}/person/${id ? id : ''}`).toPromise();
+  }
+
 }

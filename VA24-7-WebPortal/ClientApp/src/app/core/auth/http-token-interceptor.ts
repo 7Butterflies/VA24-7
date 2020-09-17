@@ -14,15 +14,13 @@ export class HttpTokenInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const tokens = sessionStorage.getItem('tokens') != null && JSON.parse(sessionStorage.getItem('tokens'));
+    const token = localStorage.getItem('msal.idtoken');
 
     //Dont add the Authorization header while refreshing the token
-    if (tokens["id_token"] != null && tokens["id_token"] != '') {
+    if (token) {
       //Refresh the token 5 mins prior its expiration time, so we don't ran into session timeout issue.
-      req = req.clone({ headers: req.headers.set('Authorization', 'Bearer ' + tokens["id_token"]) });
+      req = req.clone({ headers: req.headers.set('Authorization', 'Bearer ' + token) });
     }
-
-   
 
     return next.handle(req);
   }

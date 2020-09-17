@@ -1,30 +1,62 @@
 <p>chat-ui works!</p>
-
-<div class="form-group col-2">
-  <label class="control-label">From</label>
-  <input class="form-control" name="userId" [(ngModel)]="senderId" />
-</div>
-
-<button class="btn btn-primary btn-sm" (click)="initializeSignalR()">Start</button>
-
-<div class="form-group col-2">
-  <label class="control-label">To</label>
-  <input class="form-control" name="username" [(ngModel)]="toUser" />
-</div>
-
-<div class="form-group col-2">
-  <label class="control-label">Message</label>
-  <input class="form-control" name="message" [(ngModel)]="message" />
-</div>
-<div class="form-group col-2">
-  <button class="btn btn-primary btn-sm" (click)="SendMessage()">Send</button>
-</div>
-
-<div *ngFor="let item of chat?.messages">
-  <div [ngClass]="item.senderPersonId == senderId ? 'sender': 'reciever'">
-    <span>
-      {{item.senderPersonId}}:
-    </span>
-    {{item.content}}
+<div class="row">
+  <div class="container">
+    <h3 class=" text-center">Messaging</h3>
+    <div class="messaging">
+      <div class="inbox_msg">
+        <div class="inbox_people">
+          <div class="headind_srch">
+            <div class="recent_heading">
+              <h4>Recent</h4>
+            </div>
+            <div class="srch_bar">
+              <div class="stylish-input-group">
+                <input type="text" class="search-bar" placeholder="Search">
+                <span class="input-group-addon">
+                  <button type="button"> <i class="fa fa-search" aria-hidden="true"></i> </button>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="inbox_chat">
+            <div *ngFor="let item of contacts">
+              <div class="chat_list" [ngClass]="recipient?.id == item.id ? 'active_chat':''" (click)="selectContact(item)">
+                <div class="chat_people">
+                  <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+                  <div class="chat_ib">
+                    <h5>{{item.fullName}} <span class="chat_date">Dec 25</span></h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mesgs">
+          <div class="msg_history">
+            <div *ngFor="let item of chat?.messages">
+              <div class="" [ngClass]="item?.senderPersonId == senderId ? 'outgoing_msg': 'incoming_msg'">
+                <div class="" [ngClass]="item?.sender?.personId == loggedInUserB2CId ? '': 'received_msg'">
+                  <div class="" [ngClass]="item?.sender?.personId == loggedInUserB2CId ? 'sent_msg': 'received_withd_msg'">
+                    <p>
+                      {{item.content}}
+                    </p>
+                    <span class="time_date">{{item?.sender?.Name}} {{item.sentOn}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="chat?.messages== null || (chat?.messages && chat?.messages.length== 0)">
+              <p>No Messages to display.</p>
+            </div>
+          </div>
+          <div class="type_msg">
+            <div class="input_msg_write">
+              <input type="text" class="write_msg" placeholder="Type a message" name="message-to-send" [(ngModel)]="message" />
+              <button class="msg_send_btn" type="button" (click)="SendMessage()"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
