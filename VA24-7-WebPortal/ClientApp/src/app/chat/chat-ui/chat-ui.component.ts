@@ -54,7 +54,7 @@ export class ChatUiComponent implements OnInit {
 
   loggedInUser;
   getLoggedInUser() {
-    return this.sharedService.getLoggedInUser().then((res) => {
+    return this.sharedService.getOrCreateLoggedInUser().then((res) => {
       this.loggedInUser = res;
       this.loggedInUserB2CId = res.b2CObjectId
     })

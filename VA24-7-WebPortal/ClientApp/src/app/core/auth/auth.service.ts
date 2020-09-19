@@ -12,10 +12,14 @@ import { MsalService } from '@azure/msal-angular';
 @Injectable()
 export class AuthService {
   public authenticated: boolean = false;
+  loggedInUser;
 
-  constructor(private msalService: MsalService) {
+  constructor(private msalService: MsalService, private sharedService: SharedService) {
     if ((sessionStorage.getItem('msal.idtoken') != null && sessionStorage.getItem('msal.idtoken') != ''))
       this.authenticated = true;
+    sharedService.getOrCreateLoggedInUser().then((data) => {
+      this.loggedInUser = data
+    })
   }
 
   public async signOut() {

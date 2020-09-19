@@ -9,7 +9,7 @@ export class SharedService {
 
   constructor(private apiService: ApiService) { }
 
-  getLoggedInUser() {
+  getOrCreateLoggedInUser() {
     return this.apiService.post(`${environment.apiBaseUrl}/person`, JSON.stringify({})).toPromise();
   }
 }
