@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { IotVisualizationComponent } from './iot-visualization/iot-visualization.component';
 import { DashboardRoutingModule } from './dashboard-routing.module';
+import { SharedModule } from '../shared/shared.module';
 
 
 
@@ -10,7 +11,8 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
   declarations: [DashboardComponent, IotVisualizationComponent],
   imports: [
     CommonModule,
-    DashboardRoutingModule
+    DashboardRoutingModule,
+    SharedModule 
   ]
 })
 export class DashboardModule { }

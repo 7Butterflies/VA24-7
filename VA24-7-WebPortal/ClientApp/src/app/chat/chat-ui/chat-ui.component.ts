@@ -4,6 +4,7 @@ import { SharedService } from '../../shared/services/shared.service';
 import { ChatService } from '../chat.service';
 import { SignalRService } from '../../shared/services/signal-r.service';
 import * as SignalR from '@aspnet/signalr';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'chat-ui',
@@ -32,7 +33,7 @@ export class ChatUiComponent implements OnInit {
   }
 
   initializeSignalR() {
-    this.signalRService.init(this.loggedInUserB2CId).then((hubConnection) => {
+    this.signalRService.init(this.loggedInUserB2CId, environment.signalrChatHub).then((hubConnection) => {
       hubConnection.start().then(() => {
 
       })

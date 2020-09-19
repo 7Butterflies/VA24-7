@@ -111,11 +111,11 @@ namespace VA24_7_AF
 
         [FunctionName(nameof(SignalRConnection))]
         public static SignalRConnectionInfo SignalRConnection(
-           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "connection/{userId?}")] HttpRequest req, string userId,
+           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "connection/{userId?}/{hub}")] HttpRequest req, string userId, string hub,
            IBinder binder,
            ILogger log)
         {
-            var connectionInfo = binder.Bind<SignalRConnectionInfo>(new SignalRConnectionInfoAttribute { HubName = "chat", UserId = userId });
+            var connectionInfo = binder.Bind<SignalRConnectionInfo>(new SignalRConnectionInfoAttribute { HubName = hub, UserId = userId });
             return connectionInfo;
         }
     }

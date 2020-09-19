@@ -6,6 +6,7 @@ namespace VA24_7_Shared.Model
 {
     public class IoT
     {
+        public string Id { get; set; }
         public string DeviceId { get; set; }
         public IoTMessageType IoTMessageType { get; set; }
         public dynamic SystemProperties { get; set; }

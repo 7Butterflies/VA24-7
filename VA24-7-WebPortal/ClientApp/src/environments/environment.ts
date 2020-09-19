@@ -4,7 +4,10 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:7071/api'
+  apiBaseUrl: 'http://localhost:7071/api',
+  signalrChatHub: 'chat',
+  signalrIoTHub: 'IoT',
+  
 };
 
 /*

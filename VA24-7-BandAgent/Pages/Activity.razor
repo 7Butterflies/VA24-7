@@ -7,6 +7,20 @@
 @inject IJSRuntime JsRuntime;
 
 <h1>Band Agent</h1>
+<div class="row col-12">
+    <div class="form-group col-8">
+        <input class="form-control" type="text" @bind="@deviceConnectionString" />
+        <em>@connctionState</em>
+        @if (!isDeviceTurnedOn)
+        {
+            <button class="btn btn-primary btn-sm" @onclick="ConnectToDevice"> Connect </button>
+        }
+        else
+        {
+            <button class="btn btn-primary btn-sm" @onclick="DisconnectToDevice"> Disconnect </button>
+        }
+    </div>
+</div>
 
 <div class="row col-12">
     <div class="form-group col-4">
@@ -35,12 +49,12 @@
     <div class="form-group">
         @if (activity.IsRunning)
         {
-        <button class="btn btn-primary" @onclick="StopRunning">Stop Running</button>
+        <button class="btn btn-primary" @onclick="StopRunning">Stop Activity</button>
 
         }
         else
         {
-        <button class="btn btn-primary" @onclick="StartRunning">Start Running</button>
+    <button class="btn btn-primary" @onclick="StartRunning">Start Activity</button>
         }
         <small>Pulse is @PulseStatus</small>
     </div>
@@ -53,10 +67,38 @@
     private bool IsOnCustomActivity = false;
     private bool isDeviceTurnedOn = false;
 
-    protected override void OnInitialized()
+    public string deviceConnectionString = "";
+    public string connctionState = "Not Connected";
+
+    protected async Task ConnectToDevice()
     {
-        InitializeActivity();
+        isDeviceTurnedOn = false;
+        if (!string.IsNullOrEmpty(deviceConnectionString))
+        {
+            await VA24_7_BandAgent.Service.IoTService.ConnectToDevice(deviceConnectionString);
+            connctionState = "Connected";
+            isDeviceTurnedOn = true;
+            InitializeActivity();
+        }
+        else
+        {
+            isDeviceTurnedOn = false;
+            connctionState = "Not Connected";
+        }
     }
+
+    protected async Task DisconnectToDevice()
+    {
+        await VA24_7_BandAgent.Service.IoTService.IoTDeviceClient.CloseAsync(); ;
+        connctionState = "Not Connected";
+        isDeviceTurnedOn = false;
+    }
+
+
+    //protected override void OnInitialized()
+    //{
+    //    InitializeActivity();
+    //}
 
     private void InitializeActivity()
     {
@@ -67,11 +109,17 @@
                 await Task.Delay(1000);
                 activity.Pulserate += random.Next(0, 5);
                 activity.PulseStatus = GetPulseStatus();
+                activity.PulseDateTime = DateTime.Now;
                 await InvokeAsync(() => StateHasChanged());
+
+                if (IsOnCustomActivity || !isDeviceTurnedOn)
+                    break;
+                await activityService.sendAsync(activity);
 
                 await Task.Delay(1000);
                 activity.Pulserate -= random.Next(0, 5);
                 activity.PulseStatus = GetPulseStatus();
+                activity.PulseDateTime = DateTime.Now;
                 await InvokeAsync(() => StateHasChanged());
 
                 if (IsOnCustomActivity || !isDeviceTurnedOn)
@@ -92,9 +140,10 @@
             {
                 await Task.Delay(1000);
                 activity.Pulserate += random.Next(0, 5);
+                activity.PulseDateTime = DateTime.Now;
 
-            //Asuming the heart stop if the pulse us greater than 160 bpm.
-            if (activity.Pulserate > 160)
+                //Asuming the heart stop if the pulse us greater than 160 bpm.
+                if (activity.Pulserate > 160)
                     activity.Pulserate = 0;
                 activity.PulseStatus = GetPulseStatus();
                 await InvokeAsync(() => StateHasChanged());
@@ -120,6 +169,7 @@
                 await Task.Delay(1000);
                 activity.Pulserate -= random.Next(0, 5);
                 activity.PulseStatus = GetPulseStatus();
+                activity.PulseDateTime = DateTime.Now;
                 await InvokeAsync(() => StateHasChanged());
 
                 await activityService.sendAsync(activity);

@@ -7,6 +7,7 @@ namespace VA24_7_Shared.Model
         public bool IsRunning { get; set; } = false;
         public bool IsSleeping { get; set; } = false;
         public int Pulserate { get; set; } = 50;
+        public DateTime PulseDateTime { get; set; }
         public PulseStatus PulseStatus { get; set; } = PulseStatus.Normal;
     }
 

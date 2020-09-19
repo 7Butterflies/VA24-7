@@ -21,8 +21,8 @@ namespace VA24_7_BandAgent
         {
             Configuration = configuration;
 
-            IoTDeviceClient = DeviceClient.CreateFromConnectionString(this.Configuration["ConnectionStrings:DeviceConnectionString"]);
-            IoTDeviceClient.OpenAsync();
+            //IoTDeviceClient = DeviceClient.CreateFromConnectionString(this.Configuration["ConnectionStrings:DeviceConnectionString"]);
+            //IoTDeviceClient.OpenAsync();
         }
 
         public IConfiguration Configuration { get; }
@@ -34,7 +34,7 @@ namespace VA24_7_BandAgent
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<IIoTHub>(new IoTHub(this.IoTDeviceClient));
+            services.AddSingleton<IIoTHub, IoTHub>();
             services.AddSingleton<ActivityService>();
         }
 

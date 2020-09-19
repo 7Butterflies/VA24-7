@@ -13,13 +13,13 @@ export class SignalRService {
 
   constructor(private apiService: ApiService) { }
 
-  private getSignalRConnection(userId: string): Observable<SignalRConnection> {
-    return this.apiService.get<SignalRConnection>(`${environment.apiBaseUrl}/connection/${userId}`);
+  private getSignalRConnection(userId: string, hubName: string): Observable<SignalRConnection> {
+    return this.apiService.get<SignalRConnection>(`${environment.apiBaseUrl}/connection/${userId}/${hubName}`);
   }
 
-  init(userId: string) {
+  init(userId: string, hubname: string) {
     let hubConnection: SignalR.HubConnection;
-    return this.getSignalRConnection(userId).toPromise().then(con => {
+    return this.getSignalRConnection(userId, hubname).toPromise().then(con => {
       const options = {
         accessTokenFactory: () => con.accessToken
       };
