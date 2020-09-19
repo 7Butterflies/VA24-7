@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using VA24_7_Shared.Model;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
+using System.Collections.Generic;
 
 namespace VA24_7_AF
 {
@@ -26,6 +28,7 @@ namespace VA24_7_AF
         public static void AF_GetDeviceToCloudMessages([EventHubTrigger("af-process-messages", Connection = "IoTEventHubCompatibleEndpoint")]EventData[] messages,
             [CosmosDB(databaseName: "VA24-7-DB",collectionName: "IoT",
             ConnectionStringSetting = "CosmosDBIoTConnection")]DocumentClient documentClient,
+            [SignalR(HubName = "iot")] IAsyncCollector<SignalRMessage> signalRMessages,
              ILogger log)
         {
             Uri collectionUri = UriFactory.CreateDocumentCollectionUri("VA24-7-DB", "IoT");
@@ -55,7 +58,28 @@ namespace VA24_7_AF
                 var requestOptions = new RequestOptions() { PartitionKey = new PartitionKey(partitionKey) };
 
                 documentClient.UpsertDocumentAsync(collectionUri, document, requestOptions);
+
+                try
+                {
+                    signalRMessages.AddAsync(
+                                      new SignalRMessage
+                                      {
+                                          UserId = deviceId,
+                                          Target = "iotActivitiy",
+                                          Arguments = new[] { message }
+                                      });
+                }
+                catch (Exception ex)
+                {
+                    log.LogError("Failed to send message to the signalR client", ex.Message);
+
+                    //Flush the session as we dont have any message to send.
+                    signalRMessages.FlushAsync();
+                }
+
+
             }
+
         }
 
         [FunctionName("AF_SendCloudToDeviceMessage")]
@@ -104,6 +128,39 @@ namespace VA24_7_AF
                 return ResponseFail;
             }
         }
+
+
+        [FunctionName("AF_GET_IOTDEVICES")]
+        public static async Task<HttpResponseMessage> AF_GET_IOTDEVICES(
+      [HttpTrigger(AuthorizationLevel.Function, "get", Route = "devices")] HttpRequestMessage req,
+      [CosmosDB(
+                databaseName: "VA24-7-DB",
+                collectionName: "collection",
+                ConnectionStringSetting = "CosmosDBConnection")] DocumentClient documentClient,
+      ILogger log)
+        {
+            try
+            {
+                var registryManager = RegistryManager.CreateFromConnectionString(Environment.GetEnvironmentVariable("IoTHubOwnerConnectionString"));
+                var query = registryManager.CreateQuery("select * from devices");
+                var deviceTwins = await query.GetNextAsTwinAsync();
+
+                var deviceList = JsonConvert.DeserializeObject<List<IoTDevice>>(JsonConvert.SerializeObject(deviceTwins.ToList()));
+
+
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(deviceList), Encoding.UTF8, "application/json")
+                };
+            }
+            catch (Exception ex)
+            {
+                var ResponseFail = new HttpResponseMessage(HttpStatusCode.ExpectationFailed);
+                ResponseFail.Content = new StringContent(ex.Message);
+                return ResponseFail;
+            }
+        }
+
 
         //Direct method does not work for offline devices.
         private static async Task<CloudToDeviceMethodResult> CallDirectMethod(string message, string deviceId)

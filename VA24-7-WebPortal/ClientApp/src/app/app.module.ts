@@ -18,6 +18,8 @@ import { HomeComponent } from './home/home.component';
 import { ChatModule } from './chat/chat.module';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core/core.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export function MSALConfigFactory(): Configuration {
   return msalConfig;
@@ -34,11 +36,13 @@ export function MSALAngularConfigFactory(): MsalAngularConfiguration {
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    CoreModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ChatModule,
+    DashboardModule,
     SharedModule,
-    CoreModule,
     MsalModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full'},

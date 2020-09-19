@@ -10,4 +10,10 @@ namespace VA24_7_Shared.Model
         Critical,
         Failure
     }
+
+    public enum RecordStatus
+    {
+        Active,
+        InActive
+    }
 }

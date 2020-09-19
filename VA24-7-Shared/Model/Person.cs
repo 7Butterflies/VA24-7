@@ -25,6 +25,7 @@ namespace VA24_7_Shared.Model
         public bool isActive { get; set; }
 
         public List<Prescription> prescriptions { get; set; }
+
     }
 
     public class Person
@@ -48,6 +49,8 @@ namespace VA24_7_Shared.Model
         public string role { get; set; }
 
         public string surname { get; set; }
+
+        public IoTDevice device { get; set; }
     }
 
     public class Prescription

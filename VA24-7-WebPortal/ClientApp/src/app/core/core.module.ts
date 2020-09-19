@@ -14,12 +14,14 @@ import { SharedModule } from '../shared/shared.module';
 import { ApiService } from '../shared/services/api.service';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpTokenInterceptor } from './auth/http-token-interceptor';
+import { CommonModule } from '@angular/common';
 
 
 
 @NgModule({
     declarations: [NavMenuComponent],
-    imports: [
+  imports: [
+      CommonModule,
       RouterModule,
       SharedModule,
     ],

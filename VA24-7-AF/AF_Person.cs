@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Devices;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.WebJobs;
@@ -155,5 +157,68 @@ ILogger log)
 
             return persons;
         }
+
+        [FunctionName("AF_UPSERT_PERSON_TO_IOTDEVICE_MEMBERSHIP")]
+        public static async Task<IActionResult> AF_UPSERT_PERSON_TO_IOTDEVICE_MEMBERSHIP(
+ [HttpTrigger(AuthorizationLevel.Function, "post", Route = "person/{personId}/device/{deviceId}")] HttpRequestMessage req, string personId, string deviceId,
+ [CosmosDB(
+                databaseName: "VA24-7-DB",
+                collectionName: "collection",
+                ConnectionStringSetting = "CosmosDBConnection")] DocumentClient documentClient,
+ ILogger log)
+        {
+            try
+            {
+                var registryManager = RegistryManager.CreateFromConnectionString(Environment.GetEnvironmentVariable("IoTHubOwnerConnectionString"));
+                var query = registryManager.CreateQuery($"select * from devices where deviceId = '{deviceId}'");
+                var deviceTwins = await query.GetNextAsTwinAsync();
+
+
+                if (deviceTwins.Any())
+                {
+                    Uri collectionUri = UriFactory.CreateDocumentCollectionUri("VA24-7-DB", "collection");
+
+                    var personPartitionKey = $"partitionKey-person-useraccounts";
+
+                    var feedOptions = new FeedOptions { EnableCrossPartitionQuery = true, PartitionKey = new PartitionKey(personPartitionKey) };
+
+                    var existingDeviceAssociations = documentClient.CreateDocumentQuery<Person>(collectionUri, feedOptions)
+                      .Where(x => x.device.deviceId == deviceId && x.device.associationStatus == RecordStatus.Active.ToString())
+                     .AsEnumerable()
+                     .ToList();
+
+                    if (!existingDeviceAssociations.Any())
+                    {
+                        var person = documentClient.CreateDocumentQuery<Document>(collectionUri, feedOptions)
+                            .Where(x => x.Id == personId)
+                           .AsEnumerable()
+                           .FirstOrDefault();
+
+                        var device = new IoTDevice();
+
+                        device = new IoTDevice() { deviceId = deviceId, associationStatus = RecordStatus.Active.ToString() };
+
+                        person.SetPropertyValue("device", device);
+
+                        await documentClient.ReplaceDocumentAsync(person, new RequestOptions { PartitionKey = new PartitionKey(personPartitionKey) });
+
+                        return new OkObjectResult(person);
+                    }
+                    else
+                    {
+                        return new BadRequestObjectResult("This device has already been registered.");
+                    }
+                }
+                else
+                {
+                    return new NotFoundObjectResult("No devices found");
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
     }
 }
