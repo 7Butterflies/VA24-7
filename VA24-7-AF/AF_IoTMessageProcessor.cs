@@ -175,10 +175,10 @@ namespace VA24_7_AF
 
                 var history = new List<IOTData>();
 
-                if (fromDate == null || toDate == null)
+                if (String.IsNullOrEmpty(fromDate) || String.IsNullOrEmpty(toDate))
                 {
                     history = documentClient.CreateDocumentQuery<IOTData>(collectionUri, feedOptions)
-                        .Where(x=>x.activity.PulseDateTime >= DateTime.Now.AddHours(-6))
+                        .Where(x=>x.activity.PulseDateTime >= DateTime.Now.AddHours(-12))
                        .OrderByDescending(x => x.activity.PulseDateTime)
                       .AsEnumerable()
                       .ToList();

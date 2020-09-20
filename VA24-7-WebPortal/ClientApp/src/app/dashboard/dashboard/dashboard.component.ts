@@ -5,7 +5,8 @@ import { SharedService } from '../../shared/services/shared.service';
 
 import * as Highcharts from "highcharts/highstock";
 import { Options } from "highcharts/highstock";
-import { Subject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
+import { DashboardtService } from '../dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,11 +18,11 @@ export class DashboardComponent implements OnInit {
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions: any;
 
-  constructor(private signalRService: SignalRService, private sharedService: SharedService) { }
+  constructor(private signalRService: SignalRService, private sharedService: SharedService, private dashboardService: DashboardtService) { }
 
   promises: Promise<any>[] = [];
 
-  pulseRate: Subject<any> = new Subject<any>();
+  pulseRateSubject: BehaviorSubject<any> = new BehaviorSubject<any>(0);
 
   loggedInUserB2CId;
 
@@ -31,8 +32,15 @@ export class DashboardComponent implements OnInit {
     Promise.all(this.promises).then(_ => {
       this.initializeSignalRIoTHuB().then(_ => {
         alert("signalR IoT is Initialized");
-
+        this.getContacts();
         this.initializeCharOptions();
+
+        //if (this.loggedInUser.device)
+        //  this.getPulseRate(this.loggedInUser.device.deviceId, "", "").then(() => {
+        //    this.initializeCharOptions();
+        //  })
+        //else
+        //  this.initializeCharOptions();
       });
     })
 
@@ -40,17 +48,21 @@ export class DashboardComponent implements OnInit {
 
   initializeCharOptions() {
     let self = this;
-    let randomData = function (): any[] {
+    let preDate = function (): any[] {
       var data = [],
         time = (new Date()).getTime(),
         i;
-
       for (i = -999; i <= 0; i += 1) {
         data.push([
           time + i * 1000,
-          Math.round(2 * 100)
+          0
         ]);
       }
+
+        data.push(
+          [new Date().getTime(), 0]
+        )
+
       return data;
     }
     this.chartOptions = {
@@ -60,16 +72,12 @@ export class DashboardComponent implements OnInit {
 
             // set up the updating of the chart each second
             let series = this.series[0];
-            self.pulseRate.subscribe((p) => {
+            self.pulseRateSubject.subscribe((p) => {
               let x = (new Date()).getTime(), // current time
+                t = new Date(p.PulseDateTime).getTime(),
                 y = p.Pulserate;
-              series.addPoint([x, y], true, true);
+              series.addPoint([t, y], true, true);
             })
-            //setInterval(function () {
-            //  let x = (new Date()).getTime(), // current time
-            //    y = Math.round(Math.random() * 100);
-            //  series.addPoint([x, y], true, true);
-            //}, 1000);
           }
         }
       },
@@ -105,11 +113,19 @@ export class DashboardComponent implements OnInit {
 
       series: [
         {
-          name: 'Random data',
-          data: randomData()
+          name: 'Pulse data',
+          data: preDate()
         }
       ]
     };
+  }
+
+  contacts = [];
+  getContacts() {
+    this.sharedService.getPersons().then((res) => {
+      this.contacts = res as [];
+      this.contacts = this.contacts.filter(x => x.b2CObjectId != this.loggedInUser.b2CObjectId);
+    })
   }
 
   loggedInUser;
@@ -120,12 +136,19 @@ export class DashboardComponent implements OnInit {
     })
   }
 
+  pulseData;
+  getPulseRate(deviceId, fromDate, Todate) {
+    return this.dashboardService.getPulseRate(deviceId, fromDate, Todate).then((res) => {
+      this.pulseData = res;
+    })
+  }
+
   initializeSignalRIoTHuB() {
 
     let id = `${this.loggedInUserB2CId}-device-02`;
     id = "device-02";
 
-   return this.signalRService.init(id, environment.signalrIoTHub).then((hubConnection) => {
+    return this.signalRService.init(id, environment.signalrIoTHub).then((hubConnection) => {
       hubConnection.start().then(() => {
 
       })
@@ -137,8 +160,7 @@ export class DashboardComponent implements OnInit {
       });
 
       hubConnection.on('iotActivitiy', data => {
-        console.log(JSON.stringify(data));
-        this.pulseRate.next(data);
+        this.pulseRateSubject.next(data);
       });
 
     });

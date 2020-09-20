@@ -12,4 +12,8 @@ export class SharedService {
   getOrCreateLoggedInUser() {
     return this.apiService.post(`${environment.apiBaseUrl}/person`, JSON.stringify({})).toPromise();
   }
+
+  getPersons(id?) {
+    return this.apiService.get(`${environment.apiBaseUrl}/person/${id ? id : ''}`).toPromise();
+  }
 }
