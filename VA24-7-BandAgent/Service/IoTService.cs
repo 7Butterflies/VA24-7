@@ -15,11 +15,6 @@ namespace VA24_7_BandAgent.Service
         public static DeviceClient IoTDeviceClient { get; set; }
         public static async Task ConnectToDevice(string deviceCS)
         {
-            if (IoTDeviceClient != null)
-            {
-                await IoTDeviceClient.CloseAsync();
-            }
-
             IoTDeviceClient = DeviceClient.CreateFromConnectionString(deviceCS);
             await IoTDeviceClient.OpenAsync();
 
